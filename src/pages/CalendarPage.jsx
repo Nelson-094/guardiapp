@@ -129,11 +129,34 @@ export default function CalendarPage() {
             const today = isToday(date);
 
             let className = 'calendar__day';
+            let bgClass = '';
+
+            if (dayData?.isHoliday) {
+              bgClass = ' calendar__day--holiday';
+            } else if (!dayData?.shifts || dayData.shifts.length === 0) {
+              bgClass = ' calendar__day--off';
+            } else {
+              const firstShift = dayData.shifts[0];
+              const totalHours = dayData.shifts.reduce((sum, s) => sum + s.hours, 0);
+
+              if (firstShift.startHour === 0 && totalHours < 24) {
+                // Tira/Saliente de guardia (e.g., 00:00 a 07:00)
+                bgClass = ' calendar__day--partial';
+              } else if (firstShift.startHour >= 18) {
+                // Guardia de noche (empieza después de las 18:00)
+                bgClass = ' calendar__day--night';
+              } else if (firstShift.startHour > 0 && firstShift.startHour + totalHours <= 20) {
+                // Guardia de día que termina temprano (e.g., salir a las 19:00)
+                bgClass = ' calendar__day--partial';
+              } else {
+                // Guardia de día larga (e.g., guardia 24hs o turno general)
+                bgClass = ' calendar__day--day';
+              }
+            }
+            
             if (!inMonth) className += ' calendar__day--empty';
             if (today) className += ' calendar__day--today';
-            if (dayData?.isOff || dayData?.isPartialOff) className += ' calendar__day--off';
-            else if (dayData?.shifts?.length > 0) className += ' calendar__day--work';
-            if (dayData?.isHoliday) className += ' calendar__day--holiday';
+            className += bgClass;
 
             return (
               <div
@@ -158,9 +181,6 @@ export default function CalendarPage() {
                             {s.isNight ? '🌙' : '☀️'}
                           </span>
                         ))}
-                        {dayData.isPartialOff && (
-                          <span className="shift-badge shift-badge--off" style={{ fontSize: '0.5rem' }}>F</span>
-                        )}
                       </>
                     )}
                     {dayData.isHoliday && (
