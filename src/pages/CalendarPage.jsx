@@ -77,8 +77,24 @@ export default function CalendarPage() {
         </div>
       </div>
 
+      {/* Leyenda Visual */}
+      <div className="calendar-legend animate-in-delay">
+        <div className="legend-item">
+          <span className="shift-badge shift-badge--day">☀️</span> Día
+        </div>
+        <div className="legend-item">
+          <span className="shift-badge shift-badge--night">🌙</span> Noche
+        </div>
+        <div className="legend-item">
+          <span className="shift-badge shift-badge--off">F</span> Franco
+        </div>
+        <div className="legend-item">
+          <span className="shift-badge shift-badge--holiday">🟣</span> Feriado
+        </div>
+      </div>
+
       {/* Calendario */}
-      <div className="calendar animate-in-delay">
+      <div className="calendar animate-in-delay-2">
         <div className="calendar__header">
           <button
             className="calendar__nav-btn"
@@ -116,6 +132,7 @@ export default function CalendarPage() {
             if (!inMonth) className += ' calendar__day--empty';
             if (today) className += ' calendar__day--today';
             if (dayData?.isOff || dayData?.isPartialOff) className += ' calendar__day--off';
+            else if (dayData?.shifts?.length > 0) className += ' calendar__day--work';
             if (dayData?.isHoliday) className += ' calendar__day--holiday';
 
             return (
@@ -147,7 +164,7 @@ export default function CalendarPage() {
                       </>
                     )}
                     {dayData.isHoliday && (
-                      <span className="shift-badge shift-badge--holiday" style={{ fontSize: '0.5rem' }}>🔴</span>
+                      <span className="shift-badge shift-badge--holiday" style={{ fontSize: '0.5rem' }}>🟣</span>
                     )}
                   </>
                 )}
@@ -169,7 +186,7 @@ export default function CalendarPage() {
             </div>
             <div className="modal__body">
               {selectedDay.isHoliday && (
-                <div className="badge badge--negative" style={{ marginBottom: 12 }}>🔴 Feriado</div>
+                <div className="badge shift-badge--holiday" style={{ marginBottom: 12, display: 'inline-flex' }}>🟣 Feriado</div>
               )}
               {selectedDay.isOff && !selectedDay.isPartialOff ? (
                 <div style={{ textAlign: 'center', padding: 20 }}>
